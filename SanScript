@@ -31,7 +31,7 @@ local function ShowNotification(text, isOn)
 	notif.BackgroundColor3 = Color3.fromRGB(28, 18, 42)
 	notif.BorderSizePixel = 0
 	notif.Size = UDim2.new(0, 280, 0, 52)
-	notif.Position = UDim2.new(1, 20, 0, 20) -- เริ่มนอกจอ
+	notif.Position = UDim2.new(1, 20, 0, 20)
 	notif.ZIndex = 100
 
 	local corner = Instance.new("UICorner")
@@ -60,7 +60,7 @@ local function ShowNotification(text, isOn)
 	icon.Position = UDim2.new(0, 16, 0, 0)
 	icon.Size = UDim2.new(0, 28, 1, 0)
 	icon.Font = Enum.Font.GothamBold
-	icon.Text = isOn and "⚡" or "✕"
+	icon.Text = isOn and "⚡" or "X"
 	icon.TextColor3 = isOn and Color3.fromRGB(190, 130, 255) or Color3.fromRGB(180, 150, 210)
 	icon.TextSize = 18
 	icon.TextXAlignment = Enum.TextXAlignment.Left
@@ -77,12 +77,10 @@ local function ShowNotification(text, isOn)
 	label.TextXAlignment = Enum.TextXAlignment.Left
 	label.TextYAlignment = Enum.TextYAlignment.Center
 
-	-- เลื่อนเข้ามา
 	TweenService:Create(notif, TweenInfo.new(0.35, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
 		Position = UDim2.new(1, -300, 0, 20)
 	}):Play()
 
-	-- หายไปหลัง 2.2 วินาที
 	task.delay(2.2, function()
 		local out = TweenService:Create(notif, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.In), {
 			Position = UDim2.new(1, 20, 0, 20)
@@ -196,9 +194,9 @@ CloseBtn.BorderSizePixel = 0
 CloseBtn.Position = UDim2.new(1, -38, 0, 15)
 CloseBtn.Size = UDim2.new(0, 24, 0, 24)
 CloseBtn.Font = Enum.Font.GothamBold
-CloseBtn.Text = "✕"
+CloseBtn.Text = "X"  -- เปลี่ยนเป็น X ตามที่ขอ
 CloseBtn.TextColor3 = Color3.fromRGB(200, 180, 230)
-CloseBtn.TextSize = 11
+CloseBtn.TextSize = 12
 
 local CloseCorner = Instance.new("UICorner")
 CloseCorner.CornerRadius = UDim.new(0, 6)
@@ -254,35 +252,7 @@ UserInputService.InputChanged:Connect(function(input)
 	end
 end)
 
--- ==================== Minimize System ====================
-local isMinimized = false
-local originalSize = UDim2.new(0, 550, 0, 350)
-
-MinimizeBtn.MouseButton1Click:Connect(function()
-	isMinimized = not isMinimized
-	local targetSize = isMinimized and UDim2.new(0, 550, 0, 55) or originalSize
-
-	TweenService:Create(MainFrame, TweenInfo.new(0.22, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-		Size = targetSize
-	}):Play()
-
-	Sidebar.Visible = not isMinimized
-	TabAuto.Visible = not isMinimized
-	if Underline then Underline.Visible = not isMinimized end
-end)
-
-CloseBtn.MouseButton1Click:Connect(function()
-	ScreenGui.Enabled = not ScreenGui.Enabled
-end)
-
--- เปิด/ปิด UI ด้วย RightShift
-UserInputService.InputBegan:Connect(function(input, gameProcessed)
-	if input.KeyCode == Enum.KeyCode.RightShift then
-		ScreenGui.Enabled = not ScreenGui.Enabled
-	end
-end)
-
--- ==================== Feature Box ====================
+-- ==================== Feature Box (ต้องสร้างก่อน Minimize เพื่ออ้างอิง) ====================
 local FeatureBox = Instance.new("Frame")
 FeatureBox.Parent = MainFrame
 FeatureBox.BackgroundColor3 = Color3.fromRGB(26, 18, 40)
@@ -333,6 +303,36 @@ ToggleCircle.Size = UDim2.new(0, 16, 0, 16)
 local CircleCorner = Instance.new("UICorner")
 CircleCorner.CornerRadius = UDim.new(1, 0)
 CircleCorner.Parent = ToggleCircle
+
+-- ==================== Minimize System (แก้บัคซ่อน FeatureBox ด้วย) ====================
+local isMinimized = false
+local originalSize = UDim2.new(0, 550, 0, 350)
+
+MinimizeBtn.MouseButton1Click:Connect(function()
+	isMinimized = not isMinimized
+	local targetSize = isMinimized and UDim2.new(0, 550, 0, 55) or originalSize
+
+	TweenService:Create(MainFrame, TweenInfo.new(0.22, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+		Size = targetSize
+	}):Play()
+
+	-- ซ่อนทุกอย่างยกเว้นปุ่มควบคุมหน้าต่าง
+	Sidebar.Visible = not isMinimized
+	TabAuto.Visible = not isMinimized
+	Underline.Visible = not isMinimized
+	FeatureBox.Visible = not isMinimized   -- แก้บัคตรงนี้
+end)
+
+CloseBtn.MouseButton1Click:Connect(function()
+	ScreenGui.Enabled = not ScreenGui.Enabled
+end)
+
+-- เปิด/ปิด UI ด้วย RightShift
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+	if input.KeyCode == Enum.KeyCode.RightShift then
+		ScreenGui.Enabled = not ScreenGui.Enabled
+	end
+end)
 
 -- ==================== Logic ====================
 local isEnabled = false
