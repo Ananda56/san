@@ -1,4 +1,4 @@
--- [[ HeroScript UI: Anti-Wanted + Auto Key | Deep Purple Theme ]] --
+-- [[ HeroScript UI: Anti-Wanted + Auto Key | Deep Purple ]] --
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CoreGui = game:GetService("CoreGui")
@@ -7,33 +7,29 @@ local TweenService = game:GetService("TweenService")
 local VirtualInputManager = game:GetService("VirtualInputManager")
 local LocalPlayer = Players.LocalPlayer
 
--- ป้องกันการสร้างซ้ำหากรันหลายรอบ
 if CoreGui:FindFirstChild("HeroScriptWantedUI") then
 	CoreGui.HeroScriptWantedUI:Destroy()
 end
 
--- โหลดโมดูลเช็คดาวของเกม
 local success, WantedLevelUtil = pcall(function()
 	return require(ReplicatedStorage.SharedModules.WantedLevelUtil)
 end)
 
--- สร้าง ScreenGui หลัก
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "HeroScriptWantedUI"
 ScreenGui.Parent = CoreGui
 ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 ScreenGui.ResetOnSpawn = false
 
--- ==================== Notification System ====================
+-- ==================== Notification ====================
 local function ShowNotification(text, isOn)
 	local notif = Instance.new("Frame")
-	notif.Name = "Notification"
 	notif.Parent = ScreenGui
 	notif.BackgroundColor3 = Color3.fromRGB(28, 18, 42)
 	notif.BorderSizePixel = 0
 	notif.Size = UDim2.new(0, 280, 0, 52)
 	notif.Position = UDim2.new(1, 20, 0, 20)
-	notif.ZIndex = 100
+	notif.ZIndex = 50
 
 	local corner = Instance.new("UICorner")
 	corner.CornerRadius = UDim.new(0, 10)
@@ -47,48 +43,41 @@ local function ShowNotification(text, isOn)
 	local accent = Instance.new("Frame")
 	accent.Parent = notif
 	accent.BackgroundColor3 = isOn and Color3.fromRGB(160, 90, 255) or Color3.fromRGB(120, 80, 160)
-	accent.BorderSizePixel = 0
 	accent.Size = UDim2.new(0, 4, 1, 0)
-
-	local accentCorner = Instance.new("UICorner")
-	accentCorner.CornerRadius = UDim.new(0, 10)
-	accentCorner.Parent = accent
+	accent.BorderSizePixel = 0
+	Instance.new("UICorner", accent).CornerRadius = UDim.new(0, 10)
 
 	local icon = Instance.new("TextLabel")
 	icon.Parent = notif
 	icon.BackgroundTransparency = 1
-	icon.Position = UDim2.new(0, 16, 0, 0)
+	icon.Position = UDim2.new(0, 14, 0, 0)
 	icon.Size = UDim2.new(0, 28, 1, 0)
 	icon.Font = Enum.Font.GothamBold
 	icon.Text = isOn and "⚡" or "X"
 	icon.TextColor3 = isOn and Color3.fromRGB(190, 130, 255) or Color3.fromRGB(180, 150, 210)
 	icon.TextSize = 18
-	icon.TextXAlignment = Enum.TextXAlignment.Left
 
 	local label = Instance.new("TextLabel")
 	label.Parent = notif
 	label.BackgroundTransparency = 1
-	label.Position = UDim2.new(0, 48, 0, 0)
-	label.Size = UDim2.new(1, -60, 1, 0)
+	label.Position = UDim2.new(0, 46, 0, 0)
+	label.Size = UDim2.new(1, -56, 1, 0)
 	label.Font = Enum.Font.GothamBold
 	label.Text = text
 	label.TextColor3 = Color3.fromRGB(235, 225, 255)
 	label.TextSize = 13
 	label.TextXAlignment = Enum.TextXAlignment.Left
-	label.TextYAlignment = Enum.TextYAlignment.Center
 
-	TweenService:Create(notif, TweenInfo.new(0.35, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+	TweenService:Create(notif, TweenInfo.new(0.35, Enum.EasingStyle.Quint), {
 		Position = UDim2.new(1, -300, 0, 20)
 	}):Play()
 
 	task.delay(2.2, function()
-		local out = TweenService:Create(notif, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.In), {
+		local t = TweenService:Create(notif, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.In), {
 			Position = UDim2.new(1, 20, 0, 20)
 		})
-		out:Play()
-		out.Completed:Connect(function()
-			notif:Destroy()
-		end)
+		t:Play()
+		t.Completed:Connect(function() notif:Destroy() end)
 	end)
 end
 
@@ -101,10 +90,7 @@ MainFrame.BorderSizePixel = 0
 MainFrame.Position = UDim2.new(0.5, -275, 0.5, -210)
 MainFrame.Size = UDim2.new(0, 550, 0, 420)
 MainFrame.Active = true
-
-local MainCorner = Instance.new("UICorner")
-MainCorner.CornerRadius = UDim.new(0, 12)
-MainCorner.Parent = MainFrame
+Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 12)
 
 local MainStroke = Instance.new("UIStroke")
 MainStroke.Color = Color3.fromRGB(70, 40, 110)
@@ -117,10 +103,7 @@ Sidebar.Parent = MainFrame
 Sidebar.BackgroundColor3 = Color3.fromRGB(12, 8, 20)
 Sidebar.BorderSizePixel = 0
 Sidebar.Size = UDim2.new(0, 160, 1, 0)
-
-local SidebarCorner = Instance.new("UICorner")
-SidebarCorner.CornerRadius = UDim.new(0, 12)
-SidebarCorner.Parent = Sidebar
+Instance.new("UICorner", Sidebar).CornerRadius = UDim.new(0, 12)
 
 local LogoTitle = Instance.new("TextLabel")
 LogoTitle.Parent = Sidebar
@@ -136,8 +119,8 @@ LogoTitle.TextXAlignment = Enum.TextXAlignment.Left
 local MainText = Instance.new("TextLabel")
 MainText.Parent = Sidebar
 MainText.BackgroundTransparency = 1
-MainText.Position = UDim2.new(0, 15, 0, 65)
-MainText.Size = UDim2.new(0, 100, 0, 20)
+MainText.Position = UDim2.new(0, 15, 0, 60)
+MainText.Size = UDim2.new(0, 120, 0, 18)
 MainText.Font = Enum.Font.GothamBold
 MainText.Text = "MAIN MENU"
 MainText.TextColor3 = Color3.fromRGB(110, 90, 140)
@@ -148,25 +131,22 @@ local MenuBtn = Instance.new("TextButton")
 MenuBtn.Parent = Sidebar
 MenuBtn.BackgroundColor3 = Color3.fromRGB(35, 22, 55)
 MenuBtn.BorderSizePixel = 0
-MenuBtn.Position = UDim2.new(0, 10, 0, 92)
-MenuBtn.Size = UDim2.new(0, 140, 0, 36)
+MenuBtn.Position = UDim2.new(0, 10, 0, 88)
+MenuBtn.Size = UDim2.new(0, 140, 0, 34)
 MenuBtn.AutoButtonColor = false
 MenuBtn.Font = Enum.Font.GothamBold
-MenuBtn.Text = "  Anti-Wanted"
+MenuBtn.Text = "  Features"
 MenuBtn.TextColor3 = Color3.fromRGB(190, 130, 255)
 MenuBtn.TextSize = 12
 MenuBtn.TextXAlignment = Enum.TextXAlignment.Left
+Instance.new("UICorner", MenuBtn).CornerRadius = UDim.new(0, 8)
 
-local MenuBtnCorner = Instance.new("UICorner")
-MenuBtnCorner.CornerRadius = UDim.new(0, 8)
-MenuBtnCorner.Parent = MenuBtn
-
--- ==================== Top Tabs ====================
+-- ==================== Top ====================
 local TabAuto = Instance.new("TextButton")
 TabAuto.Parent = MainFrame
 TabAuto.BackgroundTransparency = 1
-TabAuto.Position = UDim2.new(0, 185, 0, 15)
-TabAuto.Size = UDim2.new(0, 50, 0, 30)
+TabAuto.Position = UDim2.new(0, 185, 0, 12)
+TabAuto.Size = UDim2.new(0, 50, 0, 28)
 TabAuto.Font = Enum.Font.GothamBold
 TabAuto.Text = "Auto"
 TabAuto.TextColor3 = Color3.fromRGB(240, 230, 255)
@@ -178,64 +158,50 @@ Underline.BackgroundColor3 = Color3.fromRGB(160, 90, 255)
 Underline.BorderSizePixel = 0
 Underline.Position = UDim2.new(0, 0, 1, -2)
 Underline.Size = UDim2.new(1, 0, 0, 2)
+Instance.new("UICorner", Underline).CornerRadius = UDim.new(1, 0)
 
-local UnderlineCorner = Instance.new("UICorner")
-UnderlineCorner.CornerRadius = UDim.new(1, 0)
-UnderlineCorner.Parent = Underline
-
--- ==================== Window Controls ====================
+-- ปุ่มปิด / ย่อ
 local CloseBtn = Instance.new("TextButton")
 CloseBtn.Parent = MainFrame
 CloseBtn.BackgroundColor3 = Color3.fromRGB(35, 25, 50)
 CloseBtn.BorderSizePixel = 0
-CloseBtn.Position = UDim2.new(1, -38, 0, 15)
+CloseBtn.Position = UDim2.new(1, -38, 0, 12)
 CloseBtn.Size = UDim2.new(0, 24, 0, 24)
 CloseBtn.Font = Enum.Font.GothamBold
 CloseBtn.Text = "X"
 CloseBtn.TextColor3 = Color3.fromRGB(200, 180, 230)
 CloseBtn.TextSize = 12
-
-local CloseCorner = Instance.new("UICorner")
-CloseCorner.CornerRadius = UDim.new(0, 6)
-CloseCorner.Parent = CloseBtn
+Instance.new("UICorner", CloseBtn).CornerRadius = UDim.new(0, 6)
 
 local MinimizeBtn = Instance.new("TextButton")
 MinimizeBtn.Parent = MainFrame
 MinimizeBtn.BackgroundColor3 = Color3.fromRGB(35, 25, 50)
 MinimizeBtn.BorderSizePixel = 0
-MinimizeBtn.Position = UDim2.new(1, -68, 0, 15)
+MinimizeBtn.Position = UDim2.new(1, -68, 0, 12)
 MinimizeBtn.Size = UDim2.new(0, 24, 0, 24)
 MinimizeBtn.Font = Enum.Font.GothamBold
 MinimizeBtn.Text = "—"
 MinimizeBtn.TextColor3 = Color3.fromRGB(200, 180, 230)
 MinimizeBtn.TextSize = 14
+Instance.new("UICorner", MinimizeBtn).CornerRadius = UDim.new(0, 6)
 
-local MinCorner = Instance.new("UICorner")
-MinCorner.CornerRadius = UDim.new(0, 6)
-MinCorner.Parent = MinimizeBtn
-
--- ==================== Draggable System ====================
+-- ==================== Draggable ====================
 local dragging, dragInput, dragStart, startPos
-
 MainFrame.InputBegan:Connect(function(input)
 	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
 		dragging = true
 		dragStart = input.Position
 		startPos = MainFrame.Position
 		input.Changed:Connect(function()
-			if input.UserInputState == Enum.UserInputState.End then
-				dragging = false
-			end
+			if input.UserInputState == Enum.UserInputState.End then dragging = false end
 		end)
 	end
 end)
-
 MainFrame.InputChanged:Connect(function(input)
 	if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
 		dragInput = input
 	end
 end)
-
 UserInputService.InputChanged:Connect(function(input)
 	if input == dragInput and dragging then
 		local delta = input.Position - dragStart
@@ -243,17 +209,14 @@ UserInputService.InputChanged:Connect(function(input)
 	end
 end)
 
--- ==================== Feature Box 1 : Anti-Wanted ====================
+-- ==================== 1. Anti-Wanted Box ====================
 local FeatureBox = Instance.new("Frame")
 FeatureBox.Parent = MainFrame
 FeatureBox.BackgroundColor3 = Color3.fromRGB(26, 18, 40)
 FeatureBox.BorderSizePixel = 0
-FeatureBox.Position = UDim2.new(0, 180, 0, 60)
+FeatureBox.Position = UDim2.new(0, 180, 0, 55)
 FeatureBox.Size = UDim2.new(0, 350, 0, 48)
-
-local BoxCorner = Instance.new("UICorner")
-BoxCorner.CornerRadius = UDim.new(0, 10)
-BoxCorner.Parent = FeatureBox
+Instance.new("UICorner", FeatureBox).CornerRadius = UDim.new(0, 10)
 
 local BoxStroke = Instance.new("UIStroke")
 BoxStroke.Color = Color3.fromRGB(55, 35, 85)
@@ -275,36 +238,27 @@ local ToggleBtn = Instance.new("TextButton")
 ToggleBtn.Parent = FeatureBox
 ToggleBtn.BackgroundColor3 = Color3.fromRGB(45, 30, 70)
 ToggleBtn.BorderSizePixel = 0
-ToggleBtn.Position = UDim2.new(1, -50, 0.5, -12)
+ToggleBtn.Position = UDim2.new(1, -50, 0.5, -11)
 ToggleBtn.Size = UDim2.new(0, 38, 0, 22)
 ToggleBtn.AutoButtonColor = false
 ToggleBtn.Text = ""
-
-local ToggleCorner = Instance.new("UICorner")
-ToggleCorner.CornerRadius = UDim.new(1, 0)
-ToggleCorner.Parent = ToggleBtn
+Instance.new("UICorner", ToggleBtn).CornerRadius = UDim.new(1, 0)
 
 local ToggleCircle = Instance.new("Frame")
 ToggleCircle.Parent = ToggleBtn
 ToggleCircle.BackgroundColor3 = Color3.fromRGB(160, 140, 190)
 ToggleCircle.Position = UDim2.new(0, 3, 0.5, -8)
 ToggleCircle.Size = UDim2.new(0, 16, 0, 16)
+Instance.new("UICorner", ToggleCircle).CornerRadius = UDim.new(1, 0)
 
-local CircleCorner = Instance.new("UICorner")
-CircleCorner.CornerRadius = UDim.new(1, 0)
-CircleCorner.Parent = ToggleCircle
-
--- ==================== Feature Box 2 : Auto Key ====================
+-- ==================== 2. Auto Key Box (ระบบนี้) ====================
 local FeatureBox2 = Instance.new("Frame")
 FeatureBox2.Parent = MainFrame
 FeatureBox2.BackgroundColor3 = Color3.fromRGB(26, 18, 40)
 FeatureBox2.BorderSizePixel = 0
-FeatureBox2.Position = UDim2.new(0, 180, 0, 120)
-FeatureBox2.Size = UDim2.new(0, 350, 0, 130)
-
-local Box2Corner = Instance.new("UICorner")
-Box2Corner.CornerRadius = UDim.new(0, 10)
-Box2Corner.Parent = FeatureBox2
+FeatureBox2.Position = UDim2.new(0, 180, 0, 115)
+FeatureBox2.Size = UDim2.new(0, 350, 0, 145)
+Instance.new("UICorner", FeatureBox2).CornerRadius = UDim.new(0, 10)
 
 local Box2Stroke = Instance.new("UIStroke")
 Box2Stroke.Color = Color3.fromRGB(55, 35, 85)
@@ -322,7 +276,6 @@ FeatureLabel2.TextColor3 = Color3.fromRGB(230, 220, 250)
 FeatureLabel2.TextSize = 13
 FeatureLabel2.TextXAlignment = Enum.TextXAlignment.Left
 
--- Toggle Auto Key
 local ToggleBtn2 = Instance.new("TextButton")
 ToggleBtn2.Parent = FeatureBox2
 ToggleBtn2.BackgroundColor3 = Color3.fromRGB(45, 30, 70)
@@ -331,99 +284,80 @@ ToggleBtn2.Position = UDim2.new(1, -50, 0, 10)
 ToggleBtn2.Size = UDim2.new(0, 38, 0, 22)
 ToggleBtn2.AutoButtonColor = false
 ToggleBtn2.Text = ""
-
-local Toggle2Corner = Instance.new("UICorner")
-Toggle2Corner.CornerRadius = UDim.new(1, 0)
-Toggle2Corner.Parent = ToggleBtn2
+Instance.new("UICorner", ToggleBtn2).CornerRadius = UDim.new(1, 0)
 
 local ToggleCircle2 = Instance.new("Frame")
 ToggleCircle2.Parent = ToggleBtn2
 ToggleCircle2.BackgroundColor3 = Color3.fromRGB(160, 140, 190)
 ToggleCircle2.Position = UDim2.new(0, 3, 0.5, -8)
 ToggleCircle2.Size = UDim2.new(0, 16, 0, 16)
+Instance.new("UICorner", ToggleCircle2).CornerRadius = UDim.new(1, 0)
 
-local Circle2Corner = Instance.new("UICorner")
-Circle2Corner.CornerRadius = UDim.new(1, 0)
-Circle2Corner.Parent = ToggleCircle2
-
--- ปุ่มตั้งค่า Key
+-- ปุ่มเลือก Key
 local SetKeyBtn = Instance.new("TextButton")
 SetKeyBtn.Parent = FeatureBox2
 SetKeyBtn.BackgroundColor3 = Color3.fromRGB(40, 28, 60)
 SetKeyBtn.BorderSizePixel = 0
-SetKeyBtn.Position = UDim2.new(0, 15, 0, 42)
-SetKeyBtn.Size = UDim2.new(0, 150, 0, 28)
+SetKeyBtn.Position = UDim2.new(0, 15, 0, 45)
+SetKeyBtn.Size = UDim2.new(0, 155, 0, 30)
 SetKeyBtn.Font = Enum.Font.GothamBold
 SetKeyBtn.Text = "Key: Space"
 SetKeyBtn.TextColor3 = Color3.fromRGB(200, 180, 240)
 SetKeyBtn.TextSize = 12
 SetKeyBtn.AutoButtonColor = false
+Instance.new("UICorner", SetKeyBtn).CornerRadius = UDim.new(0, 6)
 
-local SetKeyCorner = Instance.new("UICorner")
-SetKeyCorner.CornerRadius = UDim.new(0, 6)
-SetKeyCorner.Parent = SetKeyBtn
-
--- ช่องใส่เวลา
+-- ช่องเวลา
 local TimeBox = Instance.new("TextBox")
 TimeBox.Parent = FeatureBox2
 TimeBox.BackgroundColor3 = Color3.fromRGB(40, 28, 60)
 TimeBox.BorderSizePixel = 0
-TimeBox.Position = UDim2.new(0, 175, 0, 42)
-TimeBox.Size = UDim2.new(0, 80, 0, 28)
+TimeBox.Position = UDim2.new(0, 180, 0, 45)
+TimeBox.Size = UDim2.new(0, 75, 0, 30)
 TimeBox.Font = Enum.Font.GothamBold
 TimeBox.Text = "1"
-TimeBox.PlaceholderText = "Time"
+TimeBox.PlaceholderText = "เวลา"
 TimeBox.TextColor3 = Color3.fromRGB(230, 220, 255)
 TimeBox.PlaceholderColor3 = Color3.fromRGB(140, 120, 170)
 TimeBox.TextSize = 13
 TimeBox.ClearTextOnFocus = false
+Instance.new("UICorner", TimeBox).CornerRadius = UDim.new(0, 6)
 
-local TimeCorner = Instance.new("UICorner")
-TimeCorner.CornerRadius = UDim.new(0, 6)
-TimeCorner.Parent = TimeBox
-
--- ปุ่มเลือกหน่วยเวลา
+-- ปุ่มหน่วย
 local UnitBtn = Instance.new("TextButton")
 UnitBtn.Parent = FeatureBox2
 UnitBtn.BackgroundColor3 = Color3.fromRGB(50, 35, 80)
 UnitBtn.BorderSizePixel = 0
-UnitBtn.Position = UDim2.new(0, 265, 0, 42)
-UnitBtn.Size = UDim2.new(0, 70, 0, 28)
+UnitBtn.Position = UDim2.new(0, 265, 0, 45)
+UnitBtn.Size = UDim2.new(0, 70, 0, 30)
 UnitBtn.Font = Enum.Font.GothamBold
 UnitBtn.Text = "วินาที"
 UnitBtn.TextColor3 = Color3.fromRGB(190, 150, 255)
 UnitBtn.TextSize = 12
 UnitBtn.AutoButtonColor = false
+Instance.new("UICorner", UnitBtn).CornerRadius = UDim.new(0, 6)
 
-local UnitCorner = Instance.new("UICorner")
-UnitCorner.CornerRadius = UDim.new(0, 6)
-UnitCorner.Parent = UnitBtn
-
--- คำอธิบาย
 local InfoLabel = Instance.new("TextLabel")
 InfoLabel.Parent = FeatureBox2
 InfoLabel.BackgroundTransparency = 1
-InfoLabel.Position = UDim2.new(0, 15, 0, 80)
-InfoLabel.Size = UDim2.new(1, -30, 0, 40)
+InfoLabel.Position = UDim2.new(0, 15, 0, 90)
+InfoLabel.Size = UDim2.new(1, -30, 0, 45)
 InfoLabel.Font = Enum.Font.Gotham
-InfoLabel.Text = "กดปุ่ม Key เพื่อเปลี่ยนปุ่ม • เลือกหน่วยได้ ms / วินาที / นาที / ชั่วโมง"
+InfoLabel.Text = "• กดปุ่ม Key แล้วกดปุ่มคีย์บอร์ดที่ต้องการ\n• กดปุ่มหน่วยเพื่อเปลี่ยน: ms / วินาที / นาที / ชั่วโมง"
 InfoLabel.TextColor3 = Color3.fromRGB(140, 120, 170)
 InfoLabel.TextSize = 11
 InfoLabel.TextXAlignment = Enum.TextXAlignment.Left
+InfoLabel.TextYAlignment = Enum.TextYAlignment.Top
 InfoLabel.TextWrapped = true
 
--- ==================== Minimize System ====================
+-- ==================== Minimize ====================
 local isMinimized = false
 local originalSize = UDim2.new(0, 550, 0, 420)
 
 MinimizeBtn.MouseButton1Click:Connect(function()
 	isMinimized = not isMinimized
-	local targetSize = isMinimized and UDim2.new(0, 550, 0, 55) or originalSize
-
-	TweenService:Create(MainFrame, TweenInfo.new(0.22, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-		Size = targetSize
-	}):Play()
-
+	local targetSize = isMinimized and UDim2.new(0, 550, 0, 52) or originalSize
+	TweenService:Create(MainFrame, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {Size = targetSize}):Play()
 	Sidebar.Visible = not isMinimized
 	TabAuto.Visible = not isMinimized
 	Underline.Visible = not isMinimized
@@ -435,7 +369,7 @@ CloseBtn.MouseButton1Click:Connect(function()
 	ScreenGui.Enabled = not ScreenGui.Enabled
 end)
 
-UserInputService.InputBegan:Connect(function(input, gameProcessed)
+UserInputService.InputBegan:Connect(function(input)
 	if input.KeyCode == Enum.KeyCode.RightShift then
 		ScreenGui.Enabled = not ScreenGui.Enabled
 	end
@@ -444,16 +378,12 @@ end)
 -- ==================== Anti-Wanted Logic ====================
 local isEnabled = false
 
-local function leaveGame()
-	LocalPlayer:Kick("HeroScript: ตรวจพบสถานะ Wanted ทำการเตะออกแมพอัตโนมัติ!")
-end
-
 local function checkWanted()
 	if not isEnabled then return end
 	if WantedLevelUtil then
 		local level = WantedLevelUtil.GetWantedLevelAttribute(LocalPlayer)
 		if level and level > 0 then
-			leaveGame()
+			LocalPlayer:Kick("HeroScript: ตรวจพบ Wanted! เตะออกอัตโนมัติ")
 		end
 	end
 end
@@ -464,40 +394,34 @@ ToggleBtn.MouseButton1Click:Connect(function()
 		TweenService:Create(ToggleBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(140, 70, 230)}):Play()
 		TweenService:Create(ToggleCircle, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(255, 255, 255)}):Play()
 		ToggleCircle:TweenPosition(UDim2.new(1, -19, 0.5, -8), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.15, true)
-		ShowNotification("Anti-Wanted เปิดใช้งานแล้ว", true)
+		ShowNotification("Anti-Wanted เปิดแล้ว", true)
 	else
 		TweenService:Create(ToggleBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(45, 30, 70)}):Play()
 		TweenService:Create(ToggleCircle, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(160, 140, 190)}):Play()
 		ToggleCircle:TweenPosition(UDim2.new(0, 3, 0.5, -8), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.15, true)
-		ShowNotification("Anti-Wanted ปิดใช้งานแล้ว", false)
+		ShowNotification("Anti-Wanted ปิดแล้ว", false)
 	end
 end)
 
 task.spawn(function()
 	while task.wait(0.5) do
-		if isEnabled then
-			pcall(checkWanted)
-		end
+		if isEnabled then pcall(checkWanted) end
 	end
 end)
 
 -- ==================== Auto Key Logic ====================
 local autoKeyEnabled = false
 local currentKey = Enum.KeyCode.Space
-local currentUnit = "วินาที" -- ms, วินาที, นาที, ชั่วโมง
 local units = {"ms", "วินาที", "นาที", "ชั่วโมง"}
 local unitIndex = 2
+local currentUnit = "วินาที"
 
 local function getWaitTime()
 	local num = tonumber(TimeBox.Text) or 1
-	if currentUnit == "ms" then
-		return num / 1000
-	elseif currentUnit == "วินาที" then
-		return num
-	elseif currentUnit == "นาที" then
-		return num * 60
-	elseif currentUnit == "ชั่วโมง" then
-		return num * 3600
+	if currentUnit == "ms" then return math.max(num / 1000, 0.01)
+	elseif currentUnit == "วินาที" then return math.max(num, 0.01)
+	elseif currentUnit == "นาที" then return math.max(num * 60, 0.01)
+	elseif currentUnit == "ชั่วโมง" then return math.max(num * 3600, 0.01)
 	end
 	return 1
 end
@@ -505,12 +429,12 @@ end
 local function pressKey()
 	pcall(function()
 		VirtualInputManager:SendKeyEvent(true, currentKey, false, game)
-		task.wait(0.05)
+		task.wait(0.03)
 		VirtualInputManager:SendKeyEvent(false, currentKey, false, game)
 	end)
 end
 
--- เปลี่ยนหน่วยเวลา
+-- เปลี่ยนหน่วย
 UnitBtn.MouseButton1Click:Connect(function()
 	unitIndex = unitIndex % #units + 1
 	currentUnit = units[unitIndex]
@@ -522,14 +446,14 @@ local waitingForKey = false
 SetKeyBtn.MouseButton1Click:Connect(function()
 	if waitingForKey then return end
 	waitingForKey = true
-	SetKeyBtn.Text = "กดปุ่มใดก็ได้..."
-	SetKeyBtn.TextColor3 = Color3.fromRGB(255, 200, 100)
+	SetKeyBtn.Text = "กดปุ่มเลย..."
+	SetKeyBtn.TextColor3 = Color3.fromRGB(255, 200, 80)
 
 	local conn
-	conn = UserInputService.InputBegan:Connect(function(input, gp)
+	conn = UserInputService.InputBegan:Connect(function(input)
 		if input.UserInputType == Enum.UserInputType.Keyboard then
 			currentKey = input.KeyCode
-			SetKeyBtn.Text = "Key: " .. input.KeyCode.Name
+			SetKeyBtn.Text = "Key: " .. tostring(input.KeyCode.Name)
 			SetKeyBtn.TextColor3 = Color3.fromRGB(200, 180, 240)
 			waitingForKey = false
 			conn:Disconnect()
@@ -544,25 +468,25 @@ ToggleBtn2.MouseButton1Click:Connect(function()
 		TweenService:Create(ToggleBtn2, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(140, 70, 230)}):Play()
 		TweenService:Create(ToggleCircle2, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(255, 255, 255)}):Play()
 		ToggleCircle2:TweenPosition(UDim2.new(1, -19, 0.5, -8), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.15, true)
-		ShowNotification("Auto Key เปิดใช้งานแล้ว", true)
+		ShowNotification("Auto Key เปิดแล้ว", true)
 	else
 		TweenService:Create(ToggleBtn2, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(45, 30, 70)}):Play()
 		TweenService:Create(ToggleCircle2, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(160, 140, 190)}):Play()
 		ToggleCircle2:TweenPosition(UDim2.new(0, 3, 0.5, -8), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.15, true)
-		ShowNotification("Auto Key ปิดใช้งานแล้ว", false)
+		ShowNotification("Auto Key ปิดแล้ว", false)
 	end
 end)
 
--- ลูปกดปุ่มอัตโนมัติ
+-- ลูปกดปุ่ม
 task.spawn(function()
 	while true do
 		if autoKeyEnabled then
 			pressKey()
-			local waitTime = getWaitTime()
-			if waitTime < 0.01 then waitTime = 0.01 end -- ป้องกัน spam เกินไป
-			task.wait(waitTime)
+			task.wait(getWaitTime())
 		else
-			task.wait(0.1)
+			task.wait(0.15)
 		end
 	end
 end)
+
+print("[HeroScript] โหลดสำเร็จ! มีทั้ง Anti-Wanted + Auto Key Press")
