@@ -1,0 +1,221 @@
+-- [[ Vortex UI Style: Anti-Wanted Script ]] --
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local CoreGui = game:GetService("CoreGui")
+local UserInputService = game:GetService("UserInputService")
+local LocalPlayer = Players.LocalPlayer
+
+-- ป้องกันการสร้างซ้ำหากรันหลายรอบ
+if CoreGui:FindFirstChild("VortexWantedUI") then
+    CoreGui.VortexWantedUI:Destroy()
+end
+
+-- โหลดโมดูลเช็คดาวของเกม
+local success, WantedLevelUtil = pcall(function()
+    return require(ReplicatedStorage.SharedModules.WantedLevelUtil)
+end)
+
+-- สร้าง ScreenGui หลัก
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "VortexWantedUI"
+ScreenGui.Parent = CoreGui
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+-- หน้าต่างหลัก (Main Frame)
+local MainFrame = Instance.new("Frame")
+MainFrame.Name = "MainFrame"
+MainFrame.Parent = ScreenGui
+MainFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 22)
+MainFrame.BorderSizePixel = 0
+MainFrame.Position = UDim2.new(0.5, -275, 0.5, -175)
+MainFrame.Size = UDim2.new(0, 550, 0, 350)
+MainFrame.Active = true
+MainFrame.Draggable = true
+
+-- มุมโค้งมน
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0, 8)
+UICorner.Parent = MainFrame
+
+-- แถบSidebar ด้านซ้าย
+local Sidebar = Instance.new("Frame")
+Sidebar.Parent = MainFrame
+Sidebar.BackgroundColor3 = Color3.fromRGB(13, 13, 16)
+Sidebar.BorderSizePixel = 0
+Sidebar.Size = UDim2.new(0, 150, 1, 0)
+local SidebarCorner = Instance.new("UICorner")
+SidebarCorner.CornerRadius = UDim.new(0, 8)
+SidebarCorner.Parent = Sidebar
+
+-- โลโก้ Vortex ด้านบนซ้าย
+local LogoTitle = Instance.new("TextLabel")
+LogoTitle.Parent = Sidebar
+LogoTitle.BackgroundTransparency = 1
+LogoTitle.Position = UDim2.new(0, 15, 0, 15)
+LogoTitle.Size = UDim2.new(0, 120, 0, 30)
+LogoTitle.Font = Enum.Font.GothamBold
+LogoTitle.Text = " Vortex"
+LogoTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+LogoTitle.TextSize = 18
+LogoTitle.TextXAlignment = Enum.TextXAlignment.Left
+
+-- หมวดหมู่ MAIN
+local MainText = Instance.new("TextLabel")
+MainText.Parent = Sidebar
+MainText.BackgroundTransparency = 1
+MainText.Position = UDim2.new(0, 15, 0, 65)
+MainText.Size = UDim2.new(0, 100, 0, 20)
+MainText.Font = Enum.Font.GothamBold
+MainText.Text = "MAIN"
+MainText.TextColor3 = Color3.fromRGB(110, 110, 130)
+MainText.TextSize = 11
+MainText.TextXAlignment = Enum.TextXAlignment.Left
+
+-- ปุ่มเมนู Anti-Wanted (จำลองสไตล์ Black Market ในภาพ)
+local MenuBtn = Instance.new("TextButton")
+MenuBtn.Parent = Sidebar
+MenuBtn.BackgroundColor3 = Color3.fromRGB(30, 25, 45)
+MenuBtn.BorderSizePixel = 0
+MenuBtn.Position = UDim2.new(0, 10, 0, 95)
+MenuBtn.Size = UDim2.new(0, 130, 0, 35)
+MenuBtn.AutoButtonColor = false
+MenuBtn.Font = Enum.Font.GothamBold
+MenuBtn.Text = "  Anti-Wanted"
+MenuBtn.TextColor3 = Color3.fromRGB(180, 130, 255)
+MenuBtn.TextSize = 13
+MenuBtn.TextXAlignment = Enum.TextXAlignment.Left
+local MenuBtnCorner = Instance.new("UICorner")
+MenuBtnCorner.CornerRadius = UDim.new(0, 6)
+MenuBtnCorner.Parent = MenuBtn
+
+-- แถบเมนูด้านบน (Auto / Settings)
+local TabAuto = Instance.new("TextButton")
+TabAuto.Parent = MainFrame
+TabAuto.BackgroundTransparency = 1
+TabAuto.Position = UDim2.new(0, 170, 0, 15)
+TabAuto.Size = UDim2.new(0, 60, 0, 30)
+TabAuto.Font = Enum.Font.GothamBold
+TabAuto.Text = "Auto"
+TabAuto.TextColor3 = Color3.fromRGB(255, 255, 255)
+TabAuto.TextSize = 14
+
+local Underline = Instance.new("Frame")
+Underline.Parent = TabAuto
+Underline.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Underline.BorderSizePixel = 0
+Underline.Position = UDim2.new(0, 0, 1, -2)
+Underline.Size = UDim2.new(1, 0, 0, 2)
+
+-- ปุ่มปิดหน้าต่าง (X) มุมขวาบน
+local CloseBtn = Instance.new("TextButton")
+CloseBtn.Parent = MainFrame
+CloseBtn.BackgroundColor3 = Color3.fromRGB(28, 28, 35)
+CloseBtn.BorderSizePixel = 0
+CloseBtn.Position = UDim2.new(1, -40, 0, 15)
+CloseBtn.Size = UDim2.new(0, 25, 0, 25)
+CloseBtn.Font = Enum.Font.GothamBold
+CloseBtn.Text = "X"
+CloseBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
+CloseBtn.TextSize = 12
+local CloseCorner = Instance.new("UICorner")
+CloseCorner.CornerRadius = UDim.new(0, 4)
+CloseCorner.Parent = CloseBtn
+
+CloseBtn.MouseButton1Click:Connect(function()
+    ScreenGui.Enabled = not ScreenGui.Enabled
+end)
+
+-- เปิด/ปิด UI ด้วยปุ่ม RightShift บนคีย์บอร์ด
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if input.KeyCode == Enum.KeyCode.RightShift then
+        ScreenGui.Enabled = not ScreenGui.Enabled
+    end
+end)
+
+-- กล่องฟังก์ชัน Anti-Wanted (ดีไซน์แถบยาวเหมือน Ring Farm ในภาพ)
+local FeatureBox = Instance.new("Frame")
+FeatureBox.Parent = MainFrame
+FeatureBox.BackgroundColor3 = Color3.fromRGB(25, 25, 32)
+FeatureBox.BorderSizePixel = 0
+FeatureBox.Position = UDim2.new(0, 170, 0, 70)
+FeatureBox.Size = UDim2.new(0, 360, 0, 45)
+local BoxCorner = Instance.new("UICorner")
+BoxCorner.CornerRadius = UDim.new(0, 6)
+BoxCorner.Parent = FeatureBox
+
+local FeatureLabel = Instance.new("TextLabel")
+FeatureLabel.Parent = FeatureBox
+FeatureLabel.BackgroundTransparency = 1
+FeatureLabel.Position = UDim2.new(0, 15, 0, 0)
+FeatureLabel.Size = UDim2.new(0, 250, 1, 0)
+FeatureLabel.Font = Enum.Font.GothamBold
+FeatureLabel.Text = "Auto Leave on Wanted"
+FeatureLabel.TextColor3 = Color3.fromRGB(240, 240, 240)
+FeatureLabel.TextSize = 13
+FeatureLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+-- Toggle Switch (ปุ่มเปิด-ปิดการใช้งานฟังก์ชัน)
+local ToggleBtn = Instance.new("TextButton")
+ToggleBtn.Parent = FeatureBox
+ToggleBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+ToggleBtn.BorderSizePixel = 0
+ToggleBtn.Position = UDim2.new(1, -45, 0.5, -12)
+ToggleBtn.Size = UDim2.new(0, 30, 0, 24)
+ToggleBtn.AutoButtonColor = false
+ToggleBtn.Text = ""
+local ToggleCorner = Instance.new("UICorner")
+ToggleCorner.CornerRadius = UDim.new(1, 0)
+ToggleCorner.Parent = ToggleBtn
+
+local ToggleCircle = Instance.new("Frame")
+ToggleCircle.Parent = ToggleBtn
+ToggleCircle.BackgroundColor3 = Color3.fromRGB(150, 150, 160)
+ToggleCircle.Position = UDim2.new(0, 3, 0.5, -9)
+ToggleCircle.Size = UDim2.new(0, 18, 0, 18)
+local CircleCorner = Instance.new("UICorner")
+CircleCorner.CornerRadius = UDim.new(1, 0)
+CircleCorner.Parent = ToggleCircle
+
+-- สถานะการทำงานของฟังก์ชัน Anti-Wanted
+local isEnabled = false
+
+-- ฟังก์ชันออกจากเกม
+local function leaveGame()
+    LocalPlayer:Kick("Vortex: ตรวจพบสถานะ Wanted ทำการเตะออกแมพอัตโนมัติ!")
+end
+
+-- เช็คสถานะดาว
+local function checkWanted()
+    if not isEnabled then return end
+    if WantedLevelUtil then
+        local level = WantedLevelUtil.GetWantedLevelAttribute(LocalPlayer)
+        if level and level > 0 then
+            leaveGame()
+        end
+    end
+end
+
+-- กดเปิด-ปิด Toggle Switch
+ToggleBtn.MouseButton1Click:Connect(function()
+    isEnabled = not isEnabled
+    if isEnabled then
+        ToggleBtn.BackgroundColor3 = Color3.fromRGB(120, 70, 220) -- สีม่วงสไตล์ Vortex เมื่อเปิด
+        ToggleCircle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+        ToggleCircle:TweenPosition(UDim2.new(1, -21, 0.5, -9), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.15, true)
+        print("Vortex: Anti-Wanted Enabled")
+    else
+        ToggleBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+        ToggleCircle.BackgroundColor3 = Color3.fromRGB(150, 150, 160)
+        ToggleCircle:TweenPosition(UDim2.new(0, 3, 0.5, -9), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.15, true)
+        print("Vortex: Anti-Wanted Disabled")
+    end
+end)
+
+-- ลูปเช็คสถานะตลอดเวลาเมื่อเปิดใช้งาน
+task.spawn(function()
+    while task.wait(0.5) do
+        if isEnabled then
+            pcall(checkWanted)
+        end
+    end
+end)
